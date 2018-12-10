@@ -75,7 +75,7 @@
 #'
 #' @param options.nodesIdSelection : Boolean. Default to false. Add an id node selection creating an HTML select element.
 #'
-#' @references See online documentation \url{https://github.com/robson-fernandes/bnviewer/}
+#' @references See online documentation \url{http://robsonfernandes.net/bnviewer}
 #'
 #' @importFrom  methods is
 #'
@@ -105,24 +105,24 @@
 #'
 #'
 viewer <- function(bayesianNetwork,
-                 bayesianNetwork.title = "",
-                 bayesianNetwork.subtitle = "",
-                 bayesianNetwork.footer = "",
-                 bayesianNetwork.layout = "default",
-                 bayesianNetwork.width = "100%",
-                 bayesianNetwork.height = "500px",
+                   bayesianNetwork.title = "",
+                   bayesianNetwork.subtitle = "",
+                   bayesianNetwork.footer = "",
+                   bayesianNetwork.layout = "default",
+                   bayesianNetwork.width = "100%",
+                   bayesianNetwork.height = "500px",
 
-                 node.shape = c("dot"),
-                 node.label.prefix = "",
-                 node.colors = list(),
+                   node.shape = c("dot"),
+                   node.label.prefix = "",
+                   node.colors = list(),
 
-                 edges.smooth = TRUE,
-                 edges.dashes = FALSE,
+                   edges.smooth = TRUE,
+                   edges.dashes = FALSE,
 
-                 options.highlightNearest = TRUE,
-                 options.nodesIdSelection = FALSE
+                   options.highlightNearest = TRUE,
+                   options.nodesIdSelection = FALSE
 
-                 ){
+){
 
   #BNLearn Class
   BNLearnClass =  bnlearn::.__C__bn
@@ -130,7 +130,7 @@ viewer <- function(bayesianNetwork,
   #BN.Learn Object
   if ("learning"  %in% names(bayesianNetwork) &
       "nodes"  %in% names(bayesianNetwork) &
-      "arcs"  %in% names(bayesianNetwork) &
+      "arcs"  %in% names(bayesianNetwork) |
       is(bayesianNetwork,BNLearnClass))
   {
 
@@ -148,12 +148,12 @@ viewer <- function(bayesianNetwork,
                         dashes=edges.dashes)
 
     vis.network = visNetwork::visNetwork(nodes,
-               edges,
-               width = bayesianNetwork.width,
-               height = bayesianNetwork.height,
-               main = bayesianNetwork.title,
-               submain = bayesianNetwork.subtitle,
-               footer = bayesianNetwork.footer)
+                                         edges,
+                                         width = bayesianNetwork.width,
+                                         height = bayesianNetwork.height,
+                                         main = bayesianNetwork.title,
+                                         submain = bayesianNetwork.subtitle,
+                                         footer = bayesianNetwork.footer)
 
     if (length(node.colors) > 0){
       vis.network = visNetwork::visNodes(vis.network, color = node.colors)
@@ -161,7 +161,7 @@ viewer <- function(bayesianNetwork,
 
     vis.network = visNetwork::visEdges(vis.network, arrows = "to")
     vis.network = visNetwork::visOptions(vis.network, highlightNearest = options.highlightNearest,
-                 nodesIdSelection = options.nodesIdSelection)
+                                         nodesIdSelection = options.nodesIdSelection)
 
     if (bayesianNetwork.layout != "default"){
       visNetwork::visIgraphLayout(vis.network, layout = bayesianNetwork.layout)
