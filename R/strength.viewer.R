@@ -1,6 +1,6 @@
-#' Interactive Bayesian Network Strength Viewer.
+#' @title Interactive Bayesian Network Strength Viewer
 #'
-#' Show the strength of the probabilistic relationships expressed by the arcs of
+#' @description Show the strength of the probabilistic relationships expressed by the arcs of
 #' a Bayesian network, and use model averaging to build a network containing only
 #' the significant arcs.
 #'

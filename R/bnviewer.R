@@ -1,12 +1,4 @@
-#
-# Some useful keyboard shortcuts for package authoring:
-#
-#   Build and Reload Package:  'Cmd + Shift + B'
-#   Check Package:             'Cmd + Shift + E'
-#   Test Package:              'Cmd + Shift + T'
-
-
-#' Interactive Bayesian Network Viewer
+#' @title Interactive Bayesian Network Viewer
 #'
 #' @param bayesianNetwork A Bayesian Network structure. (Example : hill-climbing (HC)).
 #'

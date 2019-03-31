@@ -2,7 +2,7 @@
 % Please edit documentation in R/strength.viewer.R
 \name{strength.viewer}
 \alias{strength.viewer}
-\title{Interactive Bayesian Network Strength Viewer.}
+\title{Interactive Bayesian Network Strength Viewer}
 \usage{
 strength.viewer(bayesianNetwork, bayesianNetwork.background = NULL,
   bayesianNetwork.boot.strength = NULL,

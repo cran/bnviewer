@@ -1,8 +1,11 @@
-1583ec926d23586947bdfb3bc7523491 *DESCRIPTION
+96228a84d99f94e12a93a57aa334660a *DESCRIPTION
 aa1073000c112849cc4a693b4019cf5d *LICENSE
-125a4aed9bab2e1623125497cbed948e *NAMESPACE
-ad22c27216b0f4a95fa1a472626d198c *R/bnviewer.R
-d053220893535e006342bbaf950e18c2 *R/strength.viewer.R
-72d32bda13478cb9f91333792be76163 *man/strength.viewer.Rd
+79f30143edb0df77a7347c04f3fb45b9 *NAMESPACE
+efc52b4e232fc4834e49c34dbc5a1f6a *R/bnviewer.R
+ce95c9c7d23e84de706701904b4823e7 *R/model.to.structure.R
+b7403f262977fb62ab32a89ac6e97301 *R/strength.viewer.R
+7dc47afa59f51b5c28ba4bc011259ed1 *man/bnviewer-package.Rd
+fb3f152d367dfb017062aa34d76626da *man/model.to.structure.Rd
+f99e4623e0c7fef419f63f0d767c3669 *man/strength.viewer.Rd
 9fe08e12ea571122b8e456d715692969 *man/viewer.Rd
 57c08b2579908b17b381e3c24943f0cd *tests/coronary.R
