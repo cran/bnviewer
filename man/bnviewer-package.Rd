@@ -18,10 +18,10 @@
 
   \tabular{ll}{
 
-    Package: \tab bnlearn\cr
+    Package: \tab bnviewer\cr
     Type: \tab Package\cr
-    Version: \tab 0.1.2\cr
-    Date: \tab 2019-31-03\cr
+    Version: \tab 0.1.3\cr
+    Date: \tab 2019-02-06\cr
     License: \tab MIT + file LICENSE
 
   }

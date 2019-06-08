@@ -75,6 +75,10 @@ strength.viewer(bayesianNetwork, bayesianNetwork.background = NULL,
   \item layout_with_gem
   \item layout_nicely
   \item layout_components
+  \item layout_hierarchical_direction_UD
+  \item layout_hierarchical_direction_DU
+  \item layout_hierarchical_direction_LR
+  \item layout_hierarchical_direction_RL
 }}
 
 \item{bayesianNetwork.width}{: String. Bayesian Network width}

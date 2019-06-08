@@ -8,9 +8,9 @@ viewer(bayesianNetwork, bayesianNetwork.title = "",
   bayesianNetwork.subtitle = "", bayesianNetwork.footer = "",
   bayesianNetwork.layout = "default", bayesianNetwork.width = "100\%",
   bayesianNetwork.height = "500px", node.shape = c("dot"),
-  node.label.prefix = "", node.colors = list(), edges.smooth = TRUE,
-  edges.dashes = FALSE, options.highlightNearest = TRUE,
-  options.nodesIdSelection = FALSE)
+  node.label.prefix = "", node.colors = list(), node.font = list(),
+  edges.smooth = TRUE, edges.dashes = FALSE,
+  options.highlightNearest = TRUE, options.nodesIdSelection = FALSE)
 }
 \arguments{
 \item{bayesianNetwork}{A Bayesian Network structure. (Example : hill-climbing (HC)).}
@@ -21,7 +21,9 @@ viewer(bayesianNetwork, bayesianNetwork.title = "",
 
 \item{bayesianNetwork.footer}{: String. Bayesian Network footer}
 
-\item{bayesianNetwork.layout}{: String. A layout of a Bayesian Network
+\item{bayesianNetwork.layout}{: String. A layout of a Bayesian Network.
+The hierarchical layout the available options are: UD, DU, LR, RL.
+To simplify: up-down, down-up, left-right, right-left.
 \enumerate{
   \item layout_on_sphere
   \item layout_on_grid
@@ -36,6 +38,10 @@ viewer(bayesianNetwork, bayesianNetwork.title = "",
   \item layout_with_gem
   \item layout_nicely
   \item layout_components
+  \item layout_hierarchical_direction_UD
+  \item layout_hierarchical_direction_DU
+  \item layout_hierarchical_direction_LR
+  \item layout_hierarchical_direction_RL
 }}
 
 \item{bayesianNetwork.width}{: String. Bayesian Network width}
@@ -71,6 +77,8 @@ Can be just one color, or a list with several elements:
      \item "border" : String. Default to '#2B7CE9'. Border color for the node when selected.
   }
 }}
+
+\item{node.font}{Node Font : Array. Example list(color = "black", face="Arial")}
 
 \item{edges.smooth}{: Boolean. When true, the edge is drawn as a dynamic quadratic bezier curve.}
 

@@ -8,7 +8,9 @@
 #'
 #' @param bayesianNetwork.footer : String. Bayesian Network footer
 #'
-#' @param bayesianNetwork.layout : String. A layout of a Bayesian Network
+#' @param bayesianNetwork.layout : String. A layout of a Bayesian Network.
+#' The hierarchical layout the available options are: UD, DU, LR, RL.
+#' To simplify: up-down, down-up, left-right, right-left.
 #' \enumerate{
 #'   \item layout_on_sphere
 #'   \item layout_on_grid
@@ -23,6 +25,10 @@
 #'   \item layout_with_gem
 #'   \item layout_nicely
 #'   \item layout_components
+#'   \item layout_hierarchical_direction_UD
+#'   \item layout_hierarchical_direction_DU
+#'   \item layout_hierarchical_direction_LR
+#'   \item layout_hierarchical_direction_RL
 #' }
 #'
 #' @param bayesianNetwork.width : String. Bayesian Network width
@@ -58,6 +64,8 @@
 #'      \item "border" : String. Default to '#2B7CE9'. Border color for the node when selected.
 #'   }
 #' }
+#'
+#' @param node.font Node Font : Array. Example list(color = "black", face="Arial")
 #'
 #' @param edges.smooth : Boolean. When true, the edge is drawn as a dynamic quadratic bezier curve.
 #'
@@ -107,6 +115,7 @@ viewer <- function(bayesianNetwork,
                    node.shape = c("dot"),
                    node.label.prefix = "",
                    node.colors = list(),
+                   node.font = list(),
 
                    edges.smooth = TRUE,
                    edges.dashes = FALSE,
@@ -148,7 +157,12 @@ viewer <- function(bayesianNetwork,
                                          footer = bayesianNetwork.footer)
 
     if (length(node.colors) > 0){
-      vis.network = visNetwork::visNodes(vis.network, color = node.colors)
+      if (length(node.font) > 0){
+        vis.network = visNetwork::visNodes(vis.network, color = node.colors, font= node.font)
+      }
+      else{
+        vis.network = visNetwork::visNodes(vis.network, color = node.colors)
+      }
     }
 
     vis.network = visNetwork::visEdges(vis.network, arrows = "to")
@@ -156,7 +170,27 @@ viewer <- function(bayesianNetwork,
                                          nodesIdSelection = options.nodesIdSelection)
 
     if (bayesianNetwork.layout != "default"){
-      visNetwork::visIgraphLayout(vis.network, layout = bayesianNetwork.layout)
+
+        direction = ""
+        if (bayesianNetwork.layout == "layout_hierarchical_direction_UD"){
+          direction = "UD"
+        }
+        else if (bayesianNetwork.layout == "layout_hierarchical_direction_DU"){
+          direction = "DU"
+        }
+        else if (bayesianNetwork.layout == "layout_hierarchical_direction_LR"){
+          direction = "LR"
+        }
+        else if (bayesianNetwork.layout == "layout_hierarchical_direction_RL"){
+          direction = "RL"
+        }
+
+        if (direction != ""){
+          visNetwork::visHierarchicalLayout(vis.network, direction = direction)
+        }
+        else{
+          visNetwork::visIgraphLayout(vis.network, layout = bayesianNetwork.layout)
+        }
     }
     else{
       visNetwork::visLayout(vis.network, randomSeed = 123)
