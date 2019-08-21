@@ -20,8 +20,8 @@
 
     Package: \tab bnviewer\cr
     Type: \tab Package\cr
-    Version: \tab 0.1.3\cr
-    Date: \tab 2019-02-06\cr
+    Version: \tab 0.1.4\cr
+    Date: \tab 2019-08-12\cr
     License: \tab MIT + file LICENSE
 
   }
@@ -33,6 +33,6 @@
   Institute of Mathematical and Computer Sciences\cr
   University of Sao Paulo - ICMC-USP
 
-  Maintainer: Robson Fernandes \email{robs.fernandes@outlook.com}
+  Maintainer: Robson Fernandes \email{robson.fernandes@usp.br}
 
 }

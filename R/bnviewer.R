@@ -2,6 +2,8 @@
 #'
 #' @param bayesianNetwork A Bayesian Network structure. (Example : hill-climbing (HC)).
 #'
+#' @param bayesianNetwork.background Bayesian network background
+#'
 #' @param bayesianNetwork.title : String. Bayesian Network title
 #'
 #' @param bayesianNetwork.subtitle : String. Bayesian Network subtitle
@@ -75,36 +77,95 @@
 #'
 #' @param options.nodesIdSelection : Boolean. Default to false. Add an id node selection creating an HTML select element.
 #'
+#' @param  clusters.legend.title : Array.  Get details in the example.
+#'
+#' @param clusters.legend.options : Array of Array. Get details in the example.
+#'
+#' @param clusters : Array of Array. Get details in the example.
+#'
 #' @references See online documentation \url{http://robsonfernandes.net/bnviewer}
 #'
 #' @importFrom  methods is
 #'
 #' @export
 #'
+#' @references See the code fontAwesome for icons in groups and nodes \url{https://fontawesome.com/v4.7.0/cheatsheet/}
+#'
 #' @examples
 #'
 #' library(bnlearn)
 #' library(bnviewer)
 #'
-#' data(coronary)
-#' bn.learn.hc = hc(coronary)
+#' data("alarm")
+#' bayesianNetwork = hc(alarm)
 #'
-#' viewer(bn.learn.hc,
-#'      bayesianNetwork.width = "100%",
-#'      bayesianNetwork.height = "80vh",
-#'      bayesianNetwork.layout = "layout_as_star",
-#'      bayesianNetwork.title="Discrete Bayesian Network - Coronary",
-#'      bayesianNetwork.subtitle = "Coronary heart disease data set",
-#'      bayesianNetwork.footer = "Fig. 1 - Layout as star",
-#'      edges.smooth = TRUE,
-#'      node.colors = list(background = "#f4bafd",
-#'                         border = "#2b7ce9",
-#'                         highlight = list(background = "#97c2fc",
-#'                                          border = "#2b7ce9"))
+#' viewer(bayesianNetwork,
+#'        bayesianNetwork.background = "-webkit-radial-gradient(center, ellipse cover,
+#'                                                              rgba(255,255,255,1) 0%,
+#'                                                              rgba(246,246,246,1) 47%,
+#'                                                              rgba(237,237,237,1) 100%)",
+#'        bayesianNetwork.width = "100%",
+#'        bayesianNetwork.height = "100vh",
+#'        bayesianNetwork.layout = "layout_components",
+#'        bayesianNetwork.title="<br>Discrete Bayesian Network - Alarm",
+#'        bayesianNetwork.subtitle = "Monitoring of emergency care patients",
+#'
+#'        node.colors = list(background = "white",
+#'                           border = "black",
+#'                           highlight = list(background = "#e91eba",
+#'                                            border = "black")),
+#'        node.font = list(color = "black", face="Arial"),
+#'
+#'        clusters.legend.title = list(text = "<b>Legend</b> <br> Variable Categories",
+#'                                     style = "font-size:18px;
+#'                                              font-family:Arial;
+#'                                              color:black;
+#'                                              text-align:center;"),
+#'        clusters.legend.options = list(
+#'          list(label = "Pressure",
+#'               shape = "icon",
+#'               icon = list(code = "f1ce",
+#'                           size = 50,
+#'                           color = "#e91e63")),
+#'          list(label = "Volume",
+#'               shape = "icon",
+#'               icon = list(code = "f140",
+#'                           size = 50,
+#'                           color = "#03a9f4")),
+#'          list(label = "Ventilation",
+#'               shape = "icon",
+#'               icon = list(code = "f192",
+#'                           size = 50,
+#'                           color = "#4caf50")),
+#'          list(label = "Saturation",
+#'               shape = "icon",
+#'               icon = list(code = "f10c",
+#'                           size = 50,
+#'                           color = "#ffc107"))
+#'        ),
+#'
+#'        clusters = list(
+#'          list(label = "Pressure",
+#'               shape = "icon",
+#'               icon = list(code = "f1ce", color = "#e91e63"),
+#'               nodes = list("CVP","BP","HRBP","PAP","PRSS")),
+#'          list(label = "Volume",
+#'               shape = "icon",
+#'               icon = list(code = "f140", color = "#03a9f4"),
+#'               nodes = list("MINV","MVS","LVV","STKV")),
+#'          list(label = "Ventilation",
+#'               shape = "icon",
+#'               icon = list(code = "f192", color = "#4caf50"),
+#'               nodes = list("VALV","VLNG","VTUB","VMCH")),
+#'          list(label = "Saturation",
+#'               shape = "icon",
+#'               icon = list(code = "f10c", color = "#ffc107"),
+#'               nodes = list("HRSA","SAO2","PVS"))
+#'        )
 #' )
 #'
-#'
 viewer <- function(bayesianNetwork,
+                   bayesianNetwork.background = NULL,
                    bayesianNetwork.title = "",
                    bayesianNetwork.subtitle = "",
                    bayesianNetwork.footer = "",
@@ -112,7 +173,7 @@ viewer <- function(bayesianNetwork,
                    bayesianNetwork.width = "100%",
                    bayesianNetwork.height = "500px",
 
-                   node.shape = c("dot"),
+                   node.shape = NULL,
                    node.label.prefix = "",
                    node.colors = list(),
                    node.font = list(),
@@ -121,7 +182,11 @@ viewer <- function(bayesianNetwork,
                    edges.dashes = FALSE,
 
                    options.highlightNearest = TRUE,
-                   options.nodesIdSelection = FALSE
+                   options.nodesIdSelection = FALSE,
+
+                   clusters.legend.title = "",
+                   clusters.legend.options = list(),
+                   clusters = list()
 
 ){
 
@@ -139,9 +204,42 @@ viewer <- function(bayesianNetwork,
     from.collection = bayesianNetwork$arcs[,1]
     to.collection = bayesianNetwork$arcs[,2]
 
-    nodes <- data.frame(id = nodes,
-                        label = paste(node.label.prefix, nodes),
-                        shape = node.shape)
+    group = c()
+    if (length(clusters) > 0){
+
+      for (node in nodes){
+        include.cluster = FALSE
+        for (cluster in clusters)
+        {
+          label = cluster$label
+          cluster.nodes = cluster$nodes
+
+          if (node %in% cluster.nodes){
+            group = c(group,label)
+            include.cluster = TRUE
+          }
+        }
+
+        if (include.cluster == FALSE){
+          group = c(group,"")
+        }
+      }
+
+    }
+
+    if (is.null(node.shape))
+    {
+      nodes <- data.frame(id = nodes,
+                          label = paste(node.label.prefix, nodes))
+    }
+    else{
+      nodes <- data.frame(id = nodes,
+                          label = paste(node.label.prefix, nodes),
+                          shape = node.shape)
+    }
+
+    if (length(group) > 0)
+      nodes$group = group
 
     edges <- data.frame(from = from.collection,
                         to = to.collection,
@@ -154,7 +252,23 @@ viewer <- function(bayesianNetwork,
                                          height = bayesianNetwork.height,
                                          main = bayesianNetwork.title,
                                          submain = bayesianNetwork.subtitle,
-                                         footer = bayesianNetwork.footer)
+                                         footer = bayesianNetwork.footer,
+                                         background = bayesianNetwork.background)
+
+    vis.network = visNetwork::addFontAwesome(vis.network)
+
+    for (cluster in clusters)
+    {
+      label = cluster$label
+      color = cluster$color
+      shape = cluster$shape
+      icon = cluster$icon
+      vis.network = visNetwork::visGroups(vis.network, groupname = label, color = color, shape = shape, icon = icon)
+    }
+    if (length(clusters.legend.options) > 0)
+    {
+      vis.network = visNetwork::visLegend(vis.network, addNodes = clusters.legend.options, main = clusters.legend.title, useGroups = FALSE)
+    }
 
     if (length(node.colors) > 0){
       if (length(node.font) > 0){
