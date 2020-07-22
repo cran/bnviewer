@@ -20,8 +20,8 @@
 
     Package: \tab bnviewer\cr
     Type: \tab Package\cr
-    Version: \tab 0.1.4\cr
-    Date: \tab 2019-08-12\cr
+    Version: \tab 0.1.5\cr
+    Date: \tab 2020-07-22\cr
     License: \tab MIT + file LICENSE
 
   }

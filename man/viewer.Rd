@@ -4,15 +4,28 @@
 \alias{viewer}
 \title{Interactive Bayesian Network Viewer}
 \usage{
-viewer(bayesianNetwork, bayesianNetwork.background = NULL,
-  bayesianNetwork.title = "", bayesianNetwork.subtitle = "",
-  bayesianNetwork.footer = "", bayesianNetwork.layout = "default",
-  bayesianNetwork.width = "100\%", bayesianNetwork.height = "500px",
-  node.shape = NULL, node.label.prefix = "", node.colors = list(),
-  node.font = list(), edges.smooth = TRUE, edges.dashes = FALSE,
-  options.highlightNearest = TRUE, options.nodesIdSelection = FALSE,
-  clusters.legend.title = "", clusters.legend.options = list(),
-  clusters = list())
+viewer(
+  bayesianNetwork,
+  bayesianNetwork.background = NULL,
+  bayesianNetwork.title = "",
+  bayesianNetwork.subtitle = "",
+  bayesianNetwork.footer = "",
+  bayesianNetwork.enabled.interactive.mode = FALSE,
+  bayesianNetwork.layout = "default",
+  bayesianNetwork.width = "100\%",
+  bayesianNetwork.height = "500px",
+  node.shape = NULL,
+  node.label.prefix = "",
+  node.colors = list(),
+  node.font = list(),
+  edges.smooth = TRUE,
+  edges.dashes = FALSE,
+  options.highlightNearest = TRUE,
+  options.nodesIdSelection = FALSE,
+  clusters.legend.title = "",
+  clusters.legend.options = list(),
+  clusters = list()
+)
 }
 \arguments{
 \item{bayesianNetwork}{A Bayesian Network structure. (Example : hill-climbing (HC)).}
@@ -24,6 +37,8 @@ viewer(bayesianNetwork, bayesianNetwork.background = NULL,
 \item{bayesianNetwork.subtitle}{: String. Bayesian Network subtitle}
 
 \item{bayesianNetwork.footer}{: String. Bayesian Network footer}
+
+\item{bayesianNetwork.enabled.interactive.mode}{: Boolean. Enabled interactive viewer mode.}
 
 \item{bayesianNetwork.layout}{: String. A layout of a Bayesian Network.
 The hierarchical layout the available options are: UD, DU, LR, RL.

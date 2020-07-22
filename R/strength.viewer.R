@@ -113,6 +113,12 @@
 #'
 #' @param options.nodesIdSelection : Boolean. Default to false. Add an id node selection creating an HTML select element.
 #'
+#' @param  clusters.legend.title : Array.  Get details in the example.
+#'
+#' @param clusters.legend.options : Array of Array. Get details in the example.
+#'
+#' @param clusters : Array of Array. Get details in the example.
+#'
 #' @references See online documentation \url{http://robsonfernandes.net/bnviewer}
 #'
 #' @importFrom  methods is
@@ -192,7 +198,7 @@ strength.viewer <- function(bayesianNetwork,
                             bayesianNetwork.width = "100%",
                             bayesianNetwork.height = "500px",
 
-                            node.shape = c("dot"),
+                            node.shape = NULL,
                             node.label.prefix = "",
                             node.colors = list(),
                             node.font = list(),
@@ -202,7 +208,11 @@ strength.viewer <- function(bayesianNetwork,
                             edges.colors = list(),
 
                             options.highlightNearest = TRUE,
-                            options.nodesIdSelection = FALSE
+                            options.nodesIdSelection = FALSE,
+
+                            clusters.legend.title = "",
+                            clusters.legend.options = list(),
+                            clusters = list()
 
 ){
 
@@ -220,6 +230,28 @@ strength.viewer <- function(bayesianNetwork,
     from.collection = bayesianNetwork$arcs[,1]
     to.collection = bayesianNetwork$arcs[,2]
 
+    group = c()
+    if (length(clusters) > 0){
+
+      for (node in nodes){
+        include.cluster = FALSE
+        for (cluster in clusters)
+        {
+          label = cluster$label
+          cluster.nodes = cluster$nodes
+
+          if (node %in% cluster.nodes){
+            group = c(group,label)
+            include.cluster = TRUE
+          }
+        }
+
+        if (include.cluster == FALSE){
+          group = c(group,"")
+        }
+      }
+
+    }
 
     strength.collection = c()
     strength.tooltip.collection = c()
@@ -239,9 +271,16 @@ strength.viewer <- function(bayesianNetwork,
     }
 
 
-    nodes <- data.frame(id = nodes,
-                        label = paste(node.label.prefix, nodes),
-                        shape = node.shape)
+    if (is.null(node.shape))
+    {
+      nodes <- data.frame(id = nodes,
+                          label = paste(node.label.prefix, nodes))
+    }
+    else{
+      nodes <- data.frame(id = nodes,
+                          label = paste(node.label.prefix, nodes),
+                          shape = node.shape)
+    }
 
     edges <- data.frame(from = from.collection,
                         to = to.collection,
@@ -249,6 +288,9 @@ strength.viewer <- function(bayesianNetwork,
                         dashes=edges.dashes,
                         value=strength.collection)
 
+
+    if (length(group) > 0)
+      nodes$group = group
 
     if (!is.null(bayesianNetwork.arc.strength.threshold.expression)){
 
@@ -315,6 +357,21 @@ strength.viewer <- function(bayesianNetwork,
                                          submain = bayesianNetwork.subtitle,
                                          footer = bayesianNetwork.footer,
                                          background = bayesianNetwork.background)
+
+    vis.network = visNetwork::addFontAwesome(vis.network)
+
+    for (cluster in clusters)
+    {
+      label = cluster$label
+      color = cluster$color
+      shape = cluster$shape
+      icon = cluster$icon
+      vis.network = visNetwork::visGroups(vis.network, groupname = label, color = color, shape = shape, icon = icon)
+    }
+    if (length(clusters.legend.options) > 0)
+    {
+      vis.network = visNetwork::visLegend(vis.network, addNodes = clusters.legend.options, main = clusters.legend.title, useGroups = FALSE)
+    }
 
     if (length(node.colors) > 0){
 
