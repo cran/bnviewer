@@ -2,14 +2,13 @@ library(bnlearn)
 library(bnviewer)
 
 data("alarm")
-bn.learn.hc = hc(alarm)
+bayesianNetwork.structure.alarm = hc(alarm)
 
-clusters.legend.title = "Legend"
-
-viewer(bn.learn.hc,
+viewer(bayesianNetwork.structure.alarm,
+       # bayesianNetwork.enabled.interactive.mode = TRUE,
        bayesianNetwork.width = "100%",
        bayesianNetwork.height = "100vh",
-       bayesianNetwork.layout = "layout_on_grid",
+       bayesianNetwork.layout = "layout_in_circle",
        edges.smooth = FALSE,
        node.colors = list(background = "white",
                           border = "black",
@@ -18,11 +17,7 @@ viewer(bn.learn.hc,
 
        node.font = list(color = "black", face="Arial"),
 
-       clusters.legend.title = list(text = clusters.legend.title,
-                                    style = "font-size:18px;
-                                             font-family:Arial;
-                                             color:black;
-                                             text-align:center;"),
+       clusters.legend.title = list(text = "Legend"),
 
        clusters.legend.options = list(
 

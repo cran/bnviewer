@@ -6,8 +6,8 @@
 \usage{
 strength.viewer(
   bayesianNetwork,
+  bayesianNetwork.boot.strength,
   bayesianNetwork.background = NULL,
-  bayesianNetwork.boot.strength = NULL,
   bayesianNetwork.arc.strength.threshold.expression = NULL,
   bayesianNetwork.arc.strength.threshold.expression.color = NULL,
   bayesianNetwork.arc.strength.threshold.alternative.color = NULL,
@@ -22,6 +22,7 @@ strength.viewer(
   bayesianNetwork.title = "",
   bayesianNetwork.subtitle = "",
   bayesianNetwork.footer = "",
+  bayesianNetwork.enabled.interactive.mode = FALSE,
   bayesianNetwork.layout = "default",
   bayesianNetwork.width = "100\%",
   bayesianNetwork.height = "500px",
@@ -29,9 +30,11 @@ strength.viewer(
   node.label.prefix = "",
   node.colors = list(),
   node.font = list(),
+  node.size = 10,
   edges.smooth = TRUE,
   edges.dashes = FALSE,
   edges.colors = list(),
+  edges.width = 1,
   options.highlightNearest = TRUE,
   options.nodesIdSelection = FALSE,
   clusters.legend.title = "",
@@ -42,9 +45,9 @@ strength.viewer(
 \arguments{
 \item{bayesianNetwork}{A Bayesian Network structure from Averaged Network}
 
-\item{bayesianNetwork.background}{Bayesian network background}
-
 \item{bayesianNetwork.boot.strength}{A nonparametric bootstrap to assess arc strength and direction}
+
+\item{bayesianNetwork.background}{Bayesian network background}
 
 \item{bayesianNetwork.arc.strength.threshold.expression}{Logical expression of the force threshold of the arcs of the Bayesian network}
 
@@ -73,6 +76,8 @@ strength.viewer(
 \item{bayesianNetwork.subtitle}{: String. Bayesian Network subtitle}
 
 \item{bayesianNetwork.footer}{: String. Bayesian Network footer}
+
+\item{bayesianNetwork.enabled.interactive.mode}{: Boolean. Enabled interactive viewer mode.}
 
 \item{bayesianNetwork.layout}{: String. A layout of a Bayesian Network
 \enumerate{
@@ -131,6 +136,8 @@ Can be just one color, or a list with several elements:
 
 \item{node.font}{Node Font : Array. Example list(color = "black", face="Arial")}
 
+\item{node.size}{Integer. Node Size.}
+
 \item{edges.smooth}{: Boolean. When true, the edge is drawn as a dynamic quadratic bezier curve.}
 
 \item{edges.dashes}{: Array or Boolean. Default to false. When true, the edge will be drawn as a dashed line.}
@@ -144,6 +151,8 @@ Can be just one color, or a list with several elements:
  \item{"inherit"}{ : String or Boolean. Default to 'from'. When color, highlight or hover are defined, inherit is set to false! Supported options are: true, false, 'from','to','both'.}
  \item{"opacity"}{ : Number. Default to 1.0. It can be useful to set the opacity of an edge without manually changing all the colors. The allowed range of the opacity option is between 0 and 1.}
 }}
+
+\item{edges.width}{: Number. Default to 1. Sets edge width.}
 
 \item{options.highlightNearest}{: Boolean. Default to true. Highlight nearest when clicking a node.}
 

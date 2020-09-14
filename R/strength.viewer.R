@@ -38,6 +38,8 @@
 #'
 #' @param bayesianNetwork.footer : String. Bayesian Network footer
 #'
+#' @param bayesianNetwork.enabled.interactive.mode : Boolean. Enabled interactive viewer mode.
+#'
 #' @param bayesianNetwork.layout : String. A layout of a Bayesian Network
 #' \enumerate{
 #'   \item layout_on_sphere
@@ -95,6 +97,8 @@
 #'
 #' @param node.font Node Font : Array. Example list(color = "black", face="Arial")
 #'
+#' @param node.size Integer. Node Size.
+#'
 #' @param edges.smooth : Boolean. When true, the edge is drawn as a dynamic quadratic bezier curve.
 #'
 #' @param edges.dashes : Array or Boolean. Default to false. When true, the edge will be drawn as a dashed line.
@@ -109,6 +113,8 @@
 #'  \item{"opacity"}{ : Number. Default to 1.0. It can be useful to set the opacity of an edge without manually changing all the colors. The allowed range of the opacity option is between 0 and 1.}
 #'}
 #'
+#' @param edges.width : Number. Default to 1. Sets edge width.
+#'
 #' @param options.highlightNearest : Boolean. Default to true. Highlight nearest when clicking a node.
 #'
 #' @param options.nodesIdSelection : Boolean. Default to false. Add an id node selection creating an HTML select element.
@@ -122,6 +128,7 @@
 #' @references See online documentation \url{http://robsonfernandes.net/bnviewer}
 #'
 #' @importFrom  methods is
+#' @importFrom  graphics legend
 #'
 #' @export
 #'
@@ -174,8 +181,8 @@
 #' )
 #'
 strength.viewer <- function(bayesianNetwork,
+                            bayesianNetwork.boot.strength,
                             bayesianNetwork.background = NULL,
-                            bayesianNetwork.boot.strength = NULL,
                             bayesianNetwork.arc.strength.threshold.expression = NULL,
                             bayesianNetwork.arc.strength.threshold.expression.color = NULL,
                             bayesianNetwork.arc.strength.threshold.alternative.color = NULL,
@@ -194,6 +201,7 @@ strength.viewer <- function(bayesianNetwork,
                             bayesianNetwork.title = "",
                             bayesianNetwork.subtitle = "",
                             bayesianNetwork.footer = "",
+                            bayesianNetwork.enabled.interactive.mode = FALSE,
                             bayesianNetwork.layout = "default",
                             bayesianNetwork.width = "100%",
                             bayesianNetwork.height = "500px",
@@ -202,10 +210,12 @@ strength.viewer <- function(bayesianNetwork,
                             node.label.prefix = "",
                             node.colors = list(),
                             node.font = list(),
+                            node.size = 10,
 
                             edges.smooth = TRUE,
                             edges.dashes = FALSE,
                             edges.colors = list(),
+                            edges.width = 1,
 
                             options.highlightNearest = TRUE,
                             options.nodesIdSelection = FALSE,
@@ -257,6 +267,20 @@ strength.viewer <- function(bayesianNetwork,
     strength.tooltip.collection = c()
     strength.collection.color = c()
 
+    assertthat::assert_that(!missing(bayesianNetwork.boot.strength),
+                            msg = "Argument bayesianNetwork.boot.strength is missing.
+                            Specify a list object of class bn.
+                            See ?bnlearn::bn.strength for more detail")
+
+    assertthat::assert_that(!is.null(bayesianNetwork.boot.strength),
+                            msg = "Argument bayesianNetwork.boot.strength is NULL.
+                            Specify a list object of class bn.
+                            See ?bnlearn::bn.strength for more detail")
+
+    assertthat::assert_that("bn.strength" %in% class(bayesianNetwork.boot.strength),
+                            msg = "Argument bayesianNetwork.boot.strength is not a list object of class bn.
+                            See ?bnlearn::bn.strength for more detail")
+
     for (i in seq_along(from.collection)){
 
       from = from.collection[i]
@@ -286,7 +310,8 @@ strength.viewer <- function(bayesianNetwork,
                         to = to.collection,
                         smooth=edges.smooth,
                         dashes=edges.dashes,
-                        value=strength.collection)
+                        value=strength.collection,
+                        width=edges.width)
 
 
     if (length(group) > 0)
@@ -410,14 +435,253 @@ strength.viewer <- function(bayesianNetwork,
       }
 
       if (direction != ""){
-        visNetwork::visHierarchicalLayout(vis.network, direction = direction)
+        vis.network = visNetwork::visHierarchicalLayout(vis.network, direction = direction)
       }
       else{
-        visNetwork::visIgraphLayout(vis.network, layout = bayesianNetwork.layout)
+        vis.network = visNetwork::visIgraphLayout(vis.network, layout = bayesianNetwork.layout)
       }
     }
     else{
-      visNetwork::visLayout(vis.network, randomSeed = 123)
+      vis.network = visNetwork::visLayout(vis.network, randomSeed = 123)
+    }
+
+    if (bayesianNetwork.enabled.interactive.mode == TRUE)
+    {
+
+      layout = c(
+        "layout_on_grid", "layout_on_sphere", "layout_in_circle", "layout_as_star", "layout_as_tree",
+        "layout_with_sugiyama", "layout_with_kk", "layout_with_dh",
+        "layout_with_lgl", "layout_with_mds", "layout_with_gem", "layout_nicely",
+        "layout_components",
+        "layout_hierarchical_direction_DU",
+        "layout_hierarchical_direction_UD",
+
+        "layout_hierarchical_direction_LR",
+        "layout_hierarchical_direction_RL")
+
+      # ----------------------------------------------
+      ## Shiny here
+      # ----------------------------------------------
+      # Define UI
+      ui <- shiny::shinyUI(shiny::fluidPage(
+
+        # App title ----
+        shiny::titlePanel(""),
+
+        # Sidebar layout with input and output definitions ----
+        shiny::sidebarLayout(
+
+          # Sidebar panel for inputs ----
+          shiny::sidebarPanel(
+            shiny::htmlOutput("bayesianNetworkInformation"),
+            shiny::hr(),
+            shiny::htmlOutput("nodes"),
+            shiny::htmlOutput("edges"),
+            shiny::hr(),
+            shiny::htmlOutput("layout"),
+            shiny::hr(),
+            shiny::selectInput("layout", "",choices=layout),
+            shiny::hr(),
+            shiny::htmlOutput("export"),
+            shiny::hr(),
+            shiny::actionButton("store_position",  "Generate Vector File", style='width:100%'),
+            shiny::br(),
+            shiny::actionButton('downloadNetwork', 'Preview Vector File', style='width:100%'),
+            width = 3),
+
+          # Main panel for displaying outputs ----
+          shiny::mainPanel(
+
+            # Output: Tabset w/ plot, summary, and table ----
+            shiny::tabsetPanel(type = "tabs",
+                               shiny::tabPanel("Bayesian Network",visNetwork::visNetworkOutput("network", height = bayesianNetwork.height))
+            )
+          )
+
+        )
+      )
+
+      )
+
+
+      # Define server
+      server <- shiny::shinyServer(function(input, output, session) {
+
+
+        output$layout <- shiny::renderUI({
+          shiny::HTML("<b>Layout</b>")
+        })
+
+
+        output$export <- shiny::renderUI({
+          shiny::HTML("<b>Export</b>")
+        })
+
+        output$bayesianNetworkInformation <- shiny::renderUI({
+          shiny::HTML("<b>Bayesian Network Information</b>")
+        })
+
+        output$nodes <- shiny::renderUI({
+          shiny::HTML(paste("Nodes:", nrow(nodes)))
+        })
+
+
+        output$edges <- shiny::renderUI({
+          shiny::HTML(paste("Edges:", nrow(edges)))
+        })
+
+        output$network <- visNetwork::renderVisNetwork({
+
+          bayesianNetwork.layout = input$layout
+
+          if (bayesianNetwork.layout != "default"){
+
+            direction = ""
+            if (bayesianNetwork.layout == "layout_hierarchical_direction_UD"){
+              direction = "UD"
+            }
+            else if (bayesianNetwork.layout == "layout_hierarchical_direction_DU"){
+              direction = "DU"
+            }
+            else if (bayesianNetwork.layout == "layout_hierarchical_direction_LR"){
+              direction = "LR"
+            }
+            else if (bayesianNetwork.layout == "layout_hierarchical_direction_RL"){
+              direction = "RL"
+            }
+
+            if (direction != ""){
+              vis.network = visNetwork::visHierarchicalLayout(vis.network, direction = direction)
+            }
+            else{
+              vis.network = visNetwork::visIgraphLayout(vis.network, layout = bayesianNetwork.layout)
+            }
+          }
+          else{
+            vis.network = visNetwork::visLayout(vis.network, randomSeed = 123)
+          }
+
+          vis.network
+        })
+
+        # format positions
+        nodes_positions <- shiny::reactive({
+          positions <- input$network_positions
+          if(!is.null(positions)){
+            nodes_positions <- do.call("rbind", lapply(positions, function(x){ data.frame(x = x$x, y = x$y)}))
+            nodes_positions$id <- names(positions)
+            nodes_positions
+          } else {
+            NULL
+          }
+        })
+
+        # get position info
+        shiny::observeEvent(input$store_position, {
+          visNetwork::visGetPositions(visNetwork::visNetworkProxy("network"))
+
+          shiny::showModal(shiny::modalDialog(
+            title = "Hey :)",
+            "Vector file generated successfully.",
+            easyClose = TRUE,
+            footer = NULL
+          ))
+
+        })
+
+        shiny::observeEvent(input$downloadNetwork, {
+
+          nodes_positions <- nodes_positions()
+
+          if(!is.null(nodes_positions)){
+            nodes_save <- merge(nodes, nodes_positions, by = "id", all = T)
+            a = nodes_save$x
+            b = nodes_save$y
+
+            nodes_save$x = a
+            nodes_save$y = b * -1
+            nodes_save$color = node.colors$background
+
+            if (length(clusters) > 0){
+              trim <- function( x ) {
+                gsub("(^[[:space:]]+|[[:space:]]+$)", "", x)
+              }
+
+              for (c in clusters){
+                nodes_save[trim(nodes_save$label) %in% c$nodes,]$color =  c$icon$color
+              }
+            }
+          } else  {
+            nodes_save <- nodes
+          }
+
+          graph <- igraph::graph_from_data_frame(vertices = nodes_save,
+                                                 d= edges,
+                                                 directed = TRUE)
+
+          if (edges.smooth == TRUE)
+          {
+            curved = seq(-0.5, 0.5, length = ecount(graph))
+          }
+          else{
+            curved = NULL
+          }
+
+          plot.igraph(graph,
+                      vertex.size = node.size,
+                      vertex.label.dist=1.5,
+                      vertex.label.color = "black",
+                      vertex.label.cex = 0.6,
+                      vertex.label.degree=pi/2,
+
+                      edge.width = 1.2,
+                      edge.arrow.width = 0.5,
+                      edge.arrow.size = 0.5,
+
+                      edge.curved=curved
+
+          )
+
+          if (length(clusters) > 0){
+            group.collection = c()
+            color.collection = c()
+
+            for (cluster in clusters){
+              group.collection = c(group.collection, cluster$label)
+              color.collection = c(color.collection, cluster$icon$color)
+            }
+
+            df_legend <- data.frame(group = group.collection,color = color.collection)
+            graphics::legend(x=-1.9, y=0.5,
+                   legend = df_legend$group,
+                   pch = 19,
+                   col = df_legend$color,
+                   bty = "n",
+                   title = clusters.legend.title$text,
+                   pt.cex=3,
+                   cex=.8,
+                   ncol=1,
+                   x.intersp =2, y.intersp = 2)
+          }
+
+          shiny::showModal(shiny::modalDialog(
+            title = "Hey :)",
+            "Vector file saved successfully. See the object in the 'Plots' tab of RStudio",
+            easyClose = TRUE,
+            footer = NULL
+          ))
+        })
+
+
+      })
+
+      #Create Shiny app ----
+      app <- shiny::shinyApp(ui, server)
+      shiny::runApp(app)
+      # ----------------------------------------------
+    }
+    else{
+      vis.network
     }
 
   }
